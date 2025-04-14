@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.proto.conexaoDadosSensoriais";
+option java_outer_classname = "SensorProto";
+
+service SensorService {
+  rpc EnviarDado (SensorRequest) returns (SensorResponse);
+  rpc ConsultarDadosLocal(LocalRequest) returns (stream LocalResponse);
+}
+
+message LocalRequest {
+  string nomeLocal = 1;
+}
+
+message LocalResponse {
+  int32 clock = 1;
+  string nomeLocal = 2;
+  string tipoSensor = 3;
+  double dadoSensor = 4;
+}
+
+message SensorRequest {
+  string id = 1;
+  int32 clock = 2;
+  string nomeLocal = 3;
+  string tipoSensor = 4;
+  double dadoSensor = 5;
+}
+
+message SensorResponse {
+  string status = 1;
+}

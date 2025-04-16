@@ -20,6 +20,8 @@ public class ServerCliente {
     public static void main(String[] args) throws IOException {
         Cliente cliente = new Cliente();
 
+        // Essa Thread realiza uma conexão via gRPC na porta 50052
+        // O Usuário pode realizar solicitações para o Cliente em busca de dados personalizados
         new Thread(() -> {
             try {
                 SensorServiceImpl grpcService = new SensorServiceImpl(cliente);
@@ -28,7 +30,7 @@ public class ServerCliente {
                         .build()
                         .start();
 
-                System.out.println("Servidor gRPC no ar");
+                System.out.println("\u001B[33m" + "Servico gRPC para requisições do usuário no ar" + "\u001B[0m");
 
                 grpcServer.awaitTermination();
             } catch (IOException | InterruptedException e) {
@@ -36,6 +38,26 @@ public class ServerCliente {
             }
         }).start();
 
+        // Essa Thread realiza uma conexão via gRPC na porta 50057
+        // Os servidores vão pegar o clock do cliente para sincronização
+//        new Thread(() -> {
+//            try {
+//                SensorServiceImpl grpcService = new SensorServiceImpl(cliente);
+//                Server grpcServer = ServerBuilder.forPort(50057)
+//                        .addService(grpcService)
+//                        .build()
+//                        .start();
+//
+//                System.out.println("\u001B[33m" + "Servico gRPC para o clock no ar" + "\u001B[0m");
+//
+//                grpcServer.awaitTermination();
+//            } catch (IOException | InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }).start();
+
+        // Essa Thread realiza uma conexão Multicast na porta 50053 e no endereço 230.0.0.0
+        // Periodicamente a cada minuto o Cliente envia uma visão geral dos dados do último minuto para os Usuários
         new Thread(() -> {
             try {
                 InetAddress group = InetAddress.getByName("230.0.0.0");
@@ -59,7 +81,7 @@ public class ServerCliente {
                                 tipoSensor = dados.getTipoSensor();
                             }
                         }
-                        mensagem += "\nMédia do ultimo minuto" +
+                        mensagem += "\nMedia do ultimo minuto" +
                                 "\nLOCAL: " + servidor +
                                 "\n" + tipoSensor + ": " + media;
                     }
@@ -75,10 +97,10 @@ public class ServerCliente {
             }
         }).start();
 
+        // Cria uma conexão via Socket na porta 50051
+        // Para receber os dados enviados pelos servidores
         ServerSocket serverSocket = new ServerSocket(50051);
-
-        System.out.println("Servidor socket no ar");
-
+        System.out.println("\u001B[33m" + "Servico Socket no ar" + "\u001B[0m");
         while (true) {
             Socket clienteSocket = serverSocket.accept();
 
@@ -91,8 +113,8 @@ public class ServerCliente {
                         cliente.setClock(clockAtualizado);
                         cliente.addDadosSensoriais(dados);
 
-                        System.out.println("Clock Atualizado: " + clockAtualizado +
-                                "\nDados recebidos: " + dados);
+                        System.out.println("\u001B[33m" + "Clock Atualizado: " + clockAtualizado + "\u001B[0m" +
+                                "\u001B[32m" + "\nDados recebidos: \n" + dados + "\u001B[0m");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -101,6 +123,7 @@ public class ServerCliente {
         }
     }
 
+    // Função para calcular as média dos dados enviados no último minuto, particular de cada servidor
     public static double mediaUltimoMinuto(ArrayList<DadosSensoriais> dadosSensoriais, String nomeLocalSensor) {
         LocalDateTime umMinutosAtras = LocalDateTime.now().minusMinutes(1);
         ArrayList<DadosSensoriais> dadosUltimaHora = new ArrayList<>();

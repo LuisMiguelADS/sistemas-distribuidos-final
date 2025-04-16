@@ -42,16 +42,6 @@ public class UsuarioGRPC2 {
             }
         }).start();
 
-//        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50052)
-//                .usePlaintext()
-//                .build();
-//
-//        SensorServiceGrpc.SensorServiceBlockingStub stub = SensorServiceGrpc.newBlockingStub(channel);
-//
-//        LocalRequest localRequest = LocalRequest.newBuilder().setNomeLocal("Quarto 1").build();
-//        stub.consultarDadosLocal(localRequest).forEachRemaining(
-//                dadosSensoriais -> System.out.println("Dados Sensoriais do local: \n" + dadosSensoriais)
-//        );
         interacaoMenuTerminal();
     }
 

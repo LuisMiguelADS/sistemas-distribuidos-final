@@ -30,12 +30,12 @@ public class UsuarioGRPC2 {
                     multicastSocket.receive(packet);
 
                     String received = new String(packet.getData(), 0, packet.getLength());
-                    System.out.println("\nMensagem recebida: \n" + received);
-                    System.out.println("\n--- Monitoraramento de sensores ---" +
+                    System.out.println("\u001B[32m" + "\nMensagem recebida: \n" + received + "\u001B[0m");
+                    System.out.println("\u001B[34m" + "\n--- Monitoraramento de sensores ---" +
                             "\nPara consultar dados de um cômodo, digite o nome." +
                             "\nPara sair, digite 'sair'." +
                             "\n-----------------------------------");
-                    System.out.print("\nComando: ");
+                    System.out.print("\nComando: " + "\u001B[0m");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -55,11 +55,11 @@ public class UsuarioGRPC2 {
             SensorServiceGrpc.SensorServiceBlockingStub stub = SensorServiceGrpc.newBlockingStub(channel);
 
             while (true) {
-                System.out.println("\n--- Monitoraramento de sensores ---" +
+                System.out.println("\u001B[34m" + "\n--- Monitoraramento de sensores ---" +
                         "\nPara consultar dados de um cômodo, digite o nome." +
                         "\nPara sair, digite 'sair'." +
                         "\n------------------------------------");
-                System.out.print("\nComando: ");
+                System.out.print("\nComando: " + "\u001B[0m");
                 String input = reader.readLine().trim();
 
                 if (input.equalsIgnoreCase("sair")) {
@@ -67,7 +67,7 @@ public class UsuarioGRPC2 {
                 } else {
                     LocalRequest localRequest = LocalRequest.newBuilder().setNomeLocal(input).build();
                     stub.consultarDadosLocal(localRequest).forEachRemaining(
-                            dadosSensoriais -> System.out.println("Dados Sensoriais do local: \n" + dadosSensoriais)
+                            dadosSensoriais -> System.out.println("\u001B[36m" + "Dados Sensoriais do local: \n" + dadosSensoriais + "\u001B[0m")
                     );
                 }
             }

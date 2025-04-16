@@ -5,8 +5,8 @@ option java_package = "com.proto.conexaoDadosSensoriais";
 option java_outer_classname = "SensorProto";
 
 service SensorService {
-  rpc EnviarDado (SensorRequest) returns (SensorResponse);
   rpc ConsultarDadosLocal(LocalRequest) returns (stream LocalResponse);
+  rpc PegarClock(ClockRequest) returns (ClockResponse);
 }
 
 message LocalRequest {
@@ -20,14 +20,10 @@ message LocalResponse {
   double dadoSensor = 4;
 }
 
-message SensorRequest {
-  string id = 1;
-  int32 clock = 2;
-  string nomeLocal = 3;
-  string tipoSensor = 4;
-  double dadoSensor = 5;
+message ClockRequest {
+  string mensagem = 1;
 }
 
-message SensorResponse {
-  string status = 1;
+message ClockResponse {
+  int32 clock = 1;
 }

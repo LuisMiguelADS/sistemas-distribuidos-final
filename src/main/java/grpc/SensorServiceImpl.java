@@ -27,4 +27,15 @@ public class SensorServiceImpl extends SensorServiceGrpc.SensorServiceImplBase {
         }
         responseObserver.onCompleted();
     }
+
+//    @Override
+//    public void pegarClock(ClockRequest request, StreamObserver<ClockResponse> responseObserver) {
+//        if (request.getMensagem().equals("Quero seu clock")) {
+//            ClockResponse response = ClockResponse.newBuilder()
+//                    .setClock(clienteReceptor.getClock())
+//                    .build();
+//            responseObserver.onNext(response);
+//        }
+//        responseObserver.onCompleted();
+//    }
 }

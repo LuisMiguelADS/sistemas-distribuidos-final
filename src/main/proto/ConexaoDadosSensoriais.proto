@@ -6,7 +6,7 @@ option java_outer_classname = "SensorProto";
 
 service SensorService {
   rpc ConsultarDadosLocal(LocalRequest) returns (stream LocalResponse);
-  rpc PegarClock(ClockRequest) returns (ClockResponse);
+  rpc Snapshot(SnapshotRequest) returns (SnapshotResponse);
 }
 
 message LocalRequest {
@@ -20,10 +20,10 @@ message LocalResponse {
   double dadoSensor = 4;
 }
 
-message ClockRequest {
+message SnapshotRequest {
   string mensagem = 1;
 }
 
-message ClockResponse {
-  int32 clock = 1;
+message SnapshotResponse {
+  string mensagem = 1;
 }

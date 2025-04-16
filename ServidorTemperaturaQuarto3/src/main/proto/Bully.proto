@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.proto.bully";
+option java_outer_classname = "BullyProto";
+
+// Definindo o serviço e as funções
+service BullyService {
+  rpc VerificarAtividade(BullyRequest) returns (BullyResponse);
+}
+
+// Mensagem enviada na requisição tem que seguir essa estrutura
+message BullyRequest {
+  string mensagem = 1;
+}
+// Da mesma forma que a requisição, porém define a estrutura da resposta
+message BullyResponse {
+  string mensagem = 1;
+}

@@ -2,6 +2,8 @@ package Testes;
 
 import com.proto.conexaoDadosSensoriais.LocalRequest;
 import com.proto.conexaoDadosSensoriais.SensorServiceGrpc;
+import com.proto.conexaoDadosSensoriais.SnapshotRequest;
+import com.proto.conexaoDadosSensoriais.SnapshotResponse;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
@@ -22,15 +24,13 @@ public class UsuarioGRPC2 {
                 MulticastSocket multicastSocket = new MulticastSocket(port);
                 multicastSocket.joinGroup(group);
 
-                byte[] buffer = new byte[1024];
-
                 while (true) {
+                    byte[] buffer = new byte[1024];
                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-
                     multicastSocket.receive(packet);
 
-                    String received = new String(packet.getData(), 0, packet.getLength());
-                    System.out.println("\u001B[32m" + "\nMensagem recebida: \n" + received + "\u001B[0m");
+                    String mensagemRecebida = new String(packet.getData(), 0, packet.getLength());
+                    System.out.println("\u001B[32m" + "\nMensagem recebida: \n" + mensagemRecebida + "\u001B[0m");
                     System.out.println("\u001B[34m" + "\n--- Monitoraramento de sensores ---" +
                             "\nPara consultar dados de um cômodo, digite o nome." +
                             "\nPara sair, digite 'sair'." +
@@ -57,6 +57,7 @@ public class UsuarioGRPC2 {
             while (true) {
                 System.out.println("\u001B[34m" + "\n--- Monitoraramento de sensores ---" +
                         "\nPara consultar dados de um cômodo, digite o nome." +
+                        "\nPara tirar um snapshot do sistema digite 'snapshot'" +
                         "\nPara sair, digite 'sair'." +
                         "\n------------------------------------");
                 System.out.print("\nComando: " + "\u001B[0m");
@@ -64,6 +65,10 @@ public class UsuarioGRPC2 {
 
                 if (input.equalsIgnoreCase("sair")) {
                     break;
+                } else if (input.equalsIgnoreCase("snapshot")) {
+                    SnapshotRequest snapshotRequest = SnapshotRequest.newBuilder().setMensagem(input).build();
+                    SnapshotResponse resposta = stub.snapshot(snapshotRequest);
+                    System.out.println("\u001B[36m" + resposta.getMensagem() + "\u001B[0m");
                 } else {
                     LocalRequest localRequest = LocalRequest.newBuilder().setNomeLocal(input).build();
                     stub.consultarDadosLocal(localRequest).forEachRemaining(

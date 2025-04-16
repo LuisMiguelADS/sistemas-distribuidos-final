@@ -38,24 +38,6 @@ public class ServerCliente {
             }
         }).start();
 
-        // Essa Thread realiza uma conexão via gRPC na porta 50057
-        // Os servidores vão pegar o clock do cliente para sincronização
-//        new Thread(() -> {
-//            try {
-//                SensorServiceImpl grpcService = new SensorServiceImpl(cliente);
-//                Server grpcServer = ServerBuilder.forPort(50057)
-//                        .addService(grpcService)
-//                        .build()
-//                        .start();
-//
-//                System.out.println("\u001B[33m" + "Servico gRPC para o clock no ar" + "\u001B[0m");
-//
-//                grpcServer.awaitTermination();
-//            } catch (IOException | InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }).start();
-
         // Essa Thread realiza uma conexão Multicast na porta 50053 e no endereço 230.0.0.0
         // Periodicamente a cada minuto o Cliente envia uma visão geral dos dados do último minuto para os Usuários
         new Thread(() -> {

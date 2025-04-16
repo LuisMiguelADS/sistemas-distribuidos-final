@@ -2,6 +2,8 @@ package Testes;
 
 import com.proto.conexaoDadosSensoriais.LocalRequest;
 import com.proto.conexaoDadosSensoriais.SensorServiceGrpc;
+import com.proto.conexaoDadosSensoriais.SnapshotRequest;
+import com.proto.conexaoDadosSensoriais.SnapshotResponse;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
@@ -55,6 +57,7 @@ public class UsuarioGRPC1 {
             while (true) {
                 System.out.println("\u001B[34m" + "\n--- Monitoraramento de sensores ---" +
                         "\nPara consultar dados de um cômodo, digite o nome." +
+                        "\nPara tirar um snapshot do sistema digite 'snapshot'" +
                         "\nPara sair, digite 'sair'." +
                         "\n------------------------------------");
                 System.out.print("\nComando: " + "\u001B[0m");
@@ -62,6 +65,10 @@ public class UsuarioGRPC1 {
 
                 if (input.equalsIgnoreCase("sair")) {
                     break;
+                } else if (input.equalsIgnoreCase("snapshot")) {
+                    SnapshotRequest snapshotRequest = SnapshotRequest.newBuilder().setMensagem(input).build();
+                    SnapshotResponse resposta = stub.snapshot(snapshotRequest);
+                    System.out.println("\u001B[36m" + resposta.getMensagem() + "\u001B[0m");
                 } else {
                     LocalRequest localRequest = LocalRequest.newBuilder().setNomeLocal(input).build();
                     stub.consultarDadosLocal(localRequest).forEachRemaining(

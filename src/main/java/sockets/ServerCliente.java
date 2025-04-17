@@ -6,6 +6,8 @@ import io.grpc.ServerBuilder;
 import models.Cliente;
 import models.DadosSensoriais;
 import models.TipoSensor;
+import repository.Banco;
+import repository.Dados;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -18,13 +20,14 @@ import java.util.Set;
 public class ServerCliente {
 
     public static void main(String[] args) throws IOException {
-        Cliente cliente = new Cliente();
+        Banco.inicializar();
+        Dados.salvarCliente(0);
 
         // Essa Thread realiza uma conexão via gRPC na porta 50052
         // O Usuário pode realizar solicitações para o Cliente em busca de dados personalizados
         new Thread(() -> {
             try {
-                SensorServiceImpl grpcService = new SensorServiceImpl(cliente);
+                SensorServiceImpl grpcService = new SensorServiceImpl();
                 Server grpcServer = ServerBuilder.forPort(50052)
                         .addService(grpcService)
                         .build()
@@ -49,7 +52,7 @@ public class ServerCliente {
 
                 while (true) {
                     Set<String> servidores = new HashSet<>();
-                    for (DadosSensoriais dados : cliente.getDadosRecebidos()) {
+                    for (DadosSensoriais dados : Dados.buscarTodos()) {
                         servidores.add(dados.getNomeLocalSensor());
                     }
 
@@ -57,8 +60,8 @@ public class ServerCliente {
 
                     for (String servidor : servidores) {
                         TipoSensor tipoSensor = null;
-                        double media = mediaUltimoMinuto(cliente.getDadosRecebidos(), servidor);
-                        for (DadosSensoriais dados : cliente.getDadosRecebidos()) {
+                        double media = mediaUltimoMinuto(servidor);
+                        for (DadosSensoriais dados : Dados.buscarTodos()) {
                             if (dados.getNomeLocalSensor().equals(servidor)) {
                                 tipoSensor = dados.getTipoSensor();
                             }
@@ -91,9 +94,9 @@ public class ServerCliente {
                     while (true) {
                         DadosSensoriais dados = (DadosSensoriais) in.readObject();
 
-                        int clockAtualizado = Math.max(dados.getClock(), cliente.getClock()) + 1;
-                        cliente.setClock(clockAtualizado);
-                        cliente.addDadosSensoriais(dados);
+                        int clockAtualizado = Math.max(dados.getClock(), Dados.buscarClockCliente()) + 1;
+                        Dados.atualizarClockCliente(clockAtualizado);
+                        Dados.salvarDadosSensoriais(dados);
 
                         System.out.println("\u001B[33m" + "Clock Atualizado: " + clockAtualizado + "\u001B[0m" +
                                 "\u001B[32m" + "\nDados recebidos: \n" + dados + "\u001B[0m");
@@ -106,12 +109,12 @@ public class ServerCliente {
     }
 
     // Função para calcular as média dos dados enviados no último minuto, particular de cada servidor
-    public static double mediaUltimoMinuto(ArrayList<DadosSensoriais> dadosSensoriais, String nomeLocalSensor) {
+    public static double mediaUltimoMinuto(String nomeLocalSensor) {
         LocalDateTime umMinutosAtras = LocalDateTime.now().minusMinutes(1);
         ArrayList<DadosSensoriais> dadosUltimaHora = new ArrayList<>();
         double media = 0.0;
 
-        for (DadosSensoriais dados : dadosSensoriais) {
+        for (DadosSensoriais dados : Dados.buscarTodos()) {
             if (dados.getDataHora().isAfter(umMinutosAtras) && dados.getNomeLocalSensor().equals(nomeLocalSensor)) {
                 dadosUltimaHora.add(dados);
             }

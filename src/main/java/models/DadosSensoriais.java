@@ -23,6 +23,8 @@ public class DadosSensoriais implements Serializable {
         this.dataHora = dataHora;
     }
 
+    public DadosSensoriais() {}
+
     public UUID getId() {
         return id;
     }

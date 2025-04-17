@@ -1,9 +1,11 @@
 package grpc;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.proto.conexaoDadosSensoriais.*;
 import io.grpc.stub.StreamObserver;
 import models.Cliente;
 import models.DadosSensoriais;
+import repository.Dados;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,15 +13,10 @@ import java.util.Map;
 import java.util.Set;
 
 public class SensorServiceImpl extends SensorServiceGrpc.SensorServiceImplBase {
-    private Cliente clienteReceptor;
-
-    public SensorServiceImpl(Cliente clienteReceptor) {
-        this.clienteReceptor = clienteReceptor;
-    }
 
     @Override
     public void consultarDadosLocal(LocalRequest request, StreamObserver<LocalResponse> responseObserver) {
-        for (DadosSensoriais dadoSensorial : clienteReceptor.getDadosRecebidos()) {
+        for (DadosSensoriais dadoSensorial : Dados.buscarTodos()) {
             if (dadoSensorial.getNomeLocalSensor().equals(request.getNomeLocal())) {
                 LocalResponse response = LocalResponse.newBuilder()
                         .setClock(dadoSensorial.getClock())
@@ -38,7 +35,7 @@ public class SensorServiceImpl extends SensorServiceGrpc.SensorServiceImplBase {
         Set<String> listaServidores = new HashSet<>();
         Map<String, DadosSensoriais> ultimosDados = new HashMap<>();
 
-        for (DadosSensoriais dadoSensorial : clienteReceptor.getDadosRecebidos()) {
+        for (DadosSensoriais dadoSensorial : Dados.buscarTodos()) {
             ultimosDados.put(dadoSensorial.getNomeLocalSensor(), dadoSensorial);
             listaServidores.add(dadoSensorial.getNomeLocalSensor());
         }
@@ -50,7 +47,9 @@ public class SensorServiceImpl extends SensorServiceGrpc.SensorServiceImplBase {
                     "\nClock: " + dado.getClock();
         }
 
-        mensagemResponse += "\nClock do Cliente (Receptor de todos os dados sensoriais): " + clienteReceptor.getClock();
+        mensagemResponse += "\nClock do Cliente (Receptor de todos os dados sensoriais): " + Dados.buscarClockCliente();
+
+        Dados.salvarCheckpoint(mensagemResponse);
 
         SnapshotResponse response = SnapshotResponse.newBuilder()
                     .setMensagem(mensagemResponse)
